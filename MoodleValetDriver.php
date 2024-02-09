@@ -1,6 +1,8 @@
 <?php
 
-class MoodleValetDriver extends BasicValetDriver
+use Valet\Drivers\LaravelValetDriver;
+
+class MoodleValetDriver extends LaravelValetDriver
 {
     protected $isStyleUri = false;
     protected $baseUri = '';
@@ -18,41 +20,43 @@ class MoodleValetDriver extends BasicValetDriver
     protected $sitePath = '';
     protected $siteName = '';
     protected $uri = '';
+
     /**
      * Determine if the driver serves the request.
      *
-     * @param  string  $sitePath
-     * @param  string  $siteName
-     * @param  string  $uri
+     * @param string $sitePath
+     * @param string $siteName
+     * @param string $uri
      * @return bool
      */
-    public function serves($sitePath, $siteName, $uri)
+    public function serves(string $sitePath, string $siteName, string $uri): bool
     {
         $this->sitePath = $sitePath;
         $this->siteName = $siteName;
         $this->uri = $uri;
 
         if (
-            file_exists($sitePath.'/config-dist.php')
-            && file_exists($sitePath.'/course')
-            && file_exists($sitePath.'/grade')
+            file_exists($sitePath . '/config-dist.php')
+            && file_exists($sitePath . '/course')
+            && file_exists($sitePath . '/grade')
         ) {
             return true;
         }
+
+        return false;
     }
 
     /**
      * Determine if the incoming request is for a static file.
      *
-     * @param  string  $sitePath
-     * @param  string  $siteName
-     * @param  string  $uri
+     * @param string $sitePath
+     * @param string $siteName
+     * @param string $uri
      * @return string|false
      */
-    public function isStaticFile($sitePath, $siteName, $uri)
+    public function isStaticFile(string $sitePath, string $siteName, string $uri): string|bool
     {
-        if (file_exists($staticFilePath = $sitePath.$uri))
-        {
+        if (file_exists($staticFilePath = $sitePath . $uri)) {
             return $staticFilePath;
         }
 
@@ -61,9 +65,10 @@ class MoodleValetDriver extends BasicValetDriver
     }
 
 
-    public function mutateUri($uri) {
-        foreach($this->moodleStaticScripts as $script) {
-            if(preg_match('/'.$script.'/i', $uri) && !preg_match('/'.$script.'$/i', $uri)) {
+    public function mutateUri(string $uri): string
+    {
+        foreach ($this->moodleStaticScripts as $script) {
+            if (preg_match('/' . $script . '/i', $uri) && !preg_match('/' . $script . '$/i', $uri)) {
                 $this->isStyleUri = true;
                 $pos = strpos($uri, $script);
                 $length = strlen($script);
@@ -73,7 +78,7 @@ class MoodleValetDriver extends BasicValetDriver
             }
         }
 
-        if(
+        if (
             empty($uri)
             || (
                 !preg_match('/.php/i', $uri)
@@ -95,18 +100,18 @@ class MoodleValetDriver extends BasicValetDriver
     /**
      * Get the fully resolved path to the application's front controller.
      *
-     * @param  string  $sitePath
-     * @param  string  $siteName
-     * @param  string  $uri
+     * @param string $sitePath
+     * @param string $siteName
+     * @param string $uri
      * @return string
      */
-    public function frontControllerPath($sitePath, $siteName, $uri)
+    public function frontControllerPath(string $sitePath, string $siteName, string $uri): string
     {
         $_SERVER['SERVER_SOFTWARE'] = 'PHP';
-        $_SERVER['PHP_SELF']    = $uri;
+        $_SERVER['PHP_SELF'] = $uri;
         $_SERVER['SERVER_ADDR'] = '127.0.0.1';
 
-        if(
+        if (
             (
                 empty($uri)
                 || (
@@ -121,11 +126,11 @@ class MoodleValetDriver extends BasicValetDriver
             return $this->asPhpIndexFileInDirectory($sitePath, $uri);
         }
 
-        if($this->isStyleUri) {
+        if ($this->isStyleUri) {
             $_SERVER['PATH_INFO'] = $uri;
-            return $sitePath.$this->baseUri;
+            return $sitePath . $this->baseUri;
         }
 
-        return $sitePath.$uri;
+        return $sitePath . $uri;
     }
 }
