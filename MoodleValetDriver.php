@@ -1,8 +1,10 @@
 <?php
 
-use Valet\Drivers\LaravelValetDriver;
+namespace Valet\Drivers\Custom;
 
-class MoodleValetDriver extends LaravelValetDriver
+use Valet\Drivers\ValetDriver;
+
+class MoodleValetDriver extends ValetDriver
 {
     protected $isStyleUri = false;
     protected $baseUri = '';
