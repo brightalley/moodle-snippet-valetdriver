@@ -109,28 +109,14 @@ class MoodleValetDriver extends ValetDriver
      */
     public function frontControllerPath(string $sitePath, string $siteName, string $uri): string
     {
-        $_SERVER['SERVER_SOFTWARE'] = 'PHP';
-        $_SERVER['PHP_SELF'] = $uri;
-        $_SERVER['SERVER_ADDR'] = '127.0.0.1';
-
-        if (
-            (
-                empty($uri)
-                || (
-                    !preg_match('/.php/i', $uri)
-                    && !preg_match('/.html/i', $uri)
-                    && !preg_match('/.js$/i', $uri)
-                )
-            )
-            && !$this->isStyleUri
-            && !$this->isStaticFile($sitePath, $siteName, $uri)
-        ) {
-            return $this->asPhpIndexFileInDirectory($sitePath, $uri);
-        }
-
         if ($this->isStyleUri) {
             $_SERVER['PATH_INFO'] = $uri;
             return $sitePath . $this->baseUri;
+        }
+
+        // Check for Moodle customscripts override for this frontcontroller.
+        if(file_exists("{$sitePath}/customscripts/{$uri}")){
+            return "{$sitePath}/customscripts/{$uri}";
         }
 
         return $sitePath . $uri;
