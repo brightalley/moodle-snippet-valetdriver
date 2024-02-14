@@ -48,6 +48,13 @@ class MoodleValetDriver extends ValetDriver
         return false;
     }
 
+    public function beforeLoading(string $sitePath, string $siteName, string $uri): void
+    {
+        $_SERVER['DOCUMENT_URI'] = $uri;
+        $_SERVER['SCRIPT_NAME'] = $uri;
+        $_SERVER['PHP_SELF'] = $uri;
+    }
+
     /**
      * Determine if the incoming request is for a static file.
      *
@@ -112,11 +119,6 @@ class MoodleValetDriver extends ValetDriver
         if ($this->isStyleUri) {
             $_SERVER['PATH_INFO'] = $uri;
             return $sitePath . $this->baseUri;
-        }
-
-        // Check for Moodle customscripts override for this frontcontroller.
-        if(file_exists("{$sitePath}/customscripts/{$uri}")){
-            return "{$sitePath}/customscripts/{$uri}";
         }
 
         return $sitePath . $uri;
