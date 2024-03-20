@@ -48,12 +48,12 @@ class MoodleValetDriver extends ValetDriver
         return false;
     }
 
-    public function beforeLoading(string $sitePath, string $siteName, string $uri): void
-    {
-        $_SERVER['DOCUMENT_URI'] = $uri;
-        $_SERVER['SCRIPT_NAME'] = $uri;
-        $_SERVER['PHP_SELF'] = $uri;
-    }
+//    public function beforeLoading(string $sitePath, string $siteName, string $uri): void
+//    {
+//        $_SERVER['DOCUMENT_URI'] = $uri;
+//        $_SERVER['SCRIPT_NAME'] = $uri;
+//        $_SERVER['PHP_SELF'] = $uri;
+//    }
 
     /**
      * Determine if the incoming request is for a static file.
