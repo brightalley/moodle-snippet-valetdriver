@@ -38,22 +38,23 @@ class MoodleValetDriver extends ValetDriver
         $this->uri = $uri;
 
         if (
-            file_exists($sitePath . '/config-dist.php')
+            file_exists($sitePath . '/config.php')
             && file_exists($sitePath . '/course')
             && file_exists($sitePath . '/grade')
         ) {
             return true;
         }
 
+        if (
+            file_exists($sitePath . '/public' . '/config.php')
+            && file_exists($sitePath . '/public' . '/course')
+            && file_exists($sitePath . '/public' . '/grade')
+        ) {
+            return true;
+        }
+
         return false;
     }
-
-//    public function beforeLoading(string $sitePath, string $siteName, string $uri): void
-//    {
-//        $_SERVER['DOCUMENT_URI'] = $uri;
-//        $_SERVER['SCRIPT_NAME'] = $uri;
-//        $_SERVER['PHP_SELF'] = $uri;
-//    }
 
     /**
      * Determine if the incoming request is for a static file.
@@ -69,10 +70,13 @@ class MoodleValetDriver extends ValetDriver
             return $staticFilePath;
         }
 
+        if (file_exists($staticFilePath = $sitePath . '/public' . $uri)) {
+            return $staticFilePath;
+        }
+
 
         return false;
     }
-
 
     public function mutateUri(string $uri): string
     {
@@ -118,9 +122,18 @@ class MoodleValetDriver extends ValetDriver
     {
         if ($this->isStyleUri) {
             $_SERVER['PATH_INFO'] = $uri;
-            return $sitePath . $this->baseUri;
+
+            if (file_exists($sitePath . $this->baseUri)) {
+                return $sitePath . $this->baseUri;
+            }
+
+            return $sitePath . '/public' . $this->baseUri;
         }
 
-        return $sitePath . $uri;
+        if (file_exists($sitePath . $uri)) {
+            return $sitePath . $uri;
+        }
+
+        return $sitePath . '/public' . $uri;
     }
 }
