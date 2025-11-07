@@ -104,7 +104,7 @@ class MoodleValetDriver extends ValetDriver
                 && !preg_match('/.svg/i', $uri)
             )
         ) {
-            return "{$uri}/index.php";
+            return "{$uri}/public/index.php";
         }
 
         return $uri;
