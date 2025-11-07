@@ -6,6 +6,13 @@ use Valet\Drivers\ValetDriver;
 
 class MoodleValetDriver extends ValetDriver
 {
+    /**
+     * The public directory name. Set to empty string if Moodle is in the root.
+     * 
+     * @var string
+     */
+    protected const PUBLIC_DIR = '/public';
+
     protected $isStyleUri = false;
     protected $baseUri = '';
     protected $moodleStaticScripts = [
@@ -38,17 +45,9 @@ class MoodleValetDriver extends ValetDriver
         $this->uri = $uri;
 
         if (
-            file_exists($sitePath . '/config.php')
-            && file_exists($sitePath . '/course')
-            && file_exists($sitePath . '/grade')
-        ) {
-            return true;
-        }
-
-        if (
-            file_exists($sitePath . '/public' . '/config.php')
-            && file_exists($sitePath . '/public' . '/course')
-            && file_exists($sitePath . '/public' . '/grade')
+            file_exists($sitePath . self::PUBLIC_DIR . '/config.php')
+            && file_exists($sitePath . self::PUBLIC_DIR . '/course')
+            && file_exists($sitePath . self::PUBLIC_DIR . '/grade')
         ) {
             return true;
         }
@@ -70,7 +69,7 @@ class MoodleValetDriver extends ValetDriver
             return $staticFilePath;
         }
 
-        if (file_exists($staticFilePath = $sitePath . '/public' . $uri)) {
+        if (file_exists($staticFilePath = $sitePath . self::PUBLIC_DIR . $uri)) {
             return $staticFilePath;
         }
 
@@ -104,7 +103,7 @@ class MoodleValetDriver extends ValetDriver
                 && !preg_match('/.svg/i', $uri)
             )
         ) {
-            return "{$uri}/public/index.php";
+            return "{$uri}" . "/index.php";
         }
 
         return $uri;
@@ -123,17 +122,13 @@ class MoodleValetDriver extends ValetDriver
         if ($this->isStyleUri) {
             $_SERVER['PATH_INFO'] = $uri;
 
-            if (file_exists($sitePath . $this->baseUri)) {
-                return $sitePath . $this->baseUri;
+            if (file_exists($sitePath . self::PUBLIC_DIR . $this->baseUri)) {
+                return $sitePath . self::PUBLIC_DIR . $this->baseUri;
             }
 
-            return $sitePath . '/public' . $this->baseUri;
+            return $sitePath . self::PUBLIC_DIR . $this->baseUri;
         }
 
-        if (file_exists($sitePath . $uri)) {
-            return $sitePath . $uri;
-        }
-
-        return $sitePath . '/public' . $uri;
+        return $sitePath . self::PUBLIC_DIR . $uri;
     }
 }
