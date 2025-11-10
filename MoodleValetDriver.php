@@ -11,7 +11,7 @@ class MoodleValetDriver extends ValetDriver
      * 
      * @var string
      */
-    protected const PUBLIC_DIR = '/public';
+    protected $publicDirectory = '';
 
     protected $isStyleUri = false;
     protected $baseUri = '';
@@ -44,10 +44,14 @@ class MoodleValetDriver extends ValetDriver
         $this->siteName = $siteName;
         $this->uri = $uri;
 
+        if(file_exists($sitePath . '/public') && is_dir($sitePath . '/public')){
+            $this->publicDirectory = '/public';
+        }
+
         if (
-            file_exists($sitePath . self::PUBLIC_DIR . '/config.php')
-            && file_exists($sitePath . self::PUBLIC_DIR . '/course')
-            && file_exists($sitePath . self::PUBLIC_DIR . '/grade')
+            file_exists($sitePath . $this->publicDirectory . '/config.php')
+            && file_exists($sitePath . $this->publicDirectory . '/course')
+            && file_exists($sitePath . $this->publicDirectory . '/grade')
         ) {
             return true;
         }
@@ -69,7 +73,7 @@ class MoodleValetDriver extends ValetDriver
             return $staticFilePath;
         }
 
-        if (file_exists($staticFilePath = $sitePath . self::PUBLIC_DIR . $uri)) {
+        if (file_exists($staticFilePath = $sitePath . $this->publicDirectory . $uri)) {
             return $staticFilePath;
         }
 
@@ -122,13 +126,13 @@ class MoodleValetDriver extends ValetDriver
         if ($this->isStyleUri) {
             $_SERVER['PATH_INFO'] = $uri;
 
-            if (file_exists($sitePath . self::PUBLIC_DIR . $this->baseUri)) {
-                return $sitePath . self::PUBLIC_DIR . $this->baseUri;
+            if (file_exists($sitePath . $this->publicDirectory . $this->baseUri)) {
+                return $sitePath . $this->publicDirectory . $this->baseUri;
             }
 
-            return $sitePath . self::PUBLIC_DIR . $this->baseUri;
+            return $sitePath . $this->publicDirectory . $this->baseUri;
         }
 
-        return $sitePath . self::PUBLIC_DIR . $uri;
+        return $sitePath . $this->publicDirectory . $uri;
     }
 }
